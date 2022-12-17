@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,9 +7,20 @@ public class InputTouchManager : Singleton <InputTouchManager>
 {
     #region Variables & Properties
 
+    public enum EnumTouchAction
+    {
+        NoTouching,
+        Tap,
+        DoubleTap,
+        Drag,
+        Slide,
+        Pinch,
+        Spread,
+        Pressing,
+    }
+
     public EnumTouchAction touchAction = EnumTouchAction.NoTouching;
     [SerializeField] private float TapDuration;
-    [SerializeField] private TouchActionCube touchActionCube;
     Touch firstTouch;
 
     private bool timerTouchingFirstTime = false;
