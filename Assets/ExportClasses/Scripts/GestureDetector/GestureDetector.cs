@@ -23,16 +23,18 @@ public class GestureDetector : Singleton<GestureDetector>
 
     public class Gesture
     {
-        private Vector2 startPos;
-        private Vector2 endPos;
-        private Vector2 delta;
-        private float distance;
+        public Vector2 startPos;
+        public Vector2 endPos;
+        public Vector2 delta;
+        public float distance;
         public GestureType currentGesture;
     }
-
+    
     #endregion
 
     private Gesture gesture;
+    public string currentGesture;
+    
     
     #region MonoBehaviour
     private void Update()
@@ -48,63 +50,65 @@ public class GestureDetector : Singleton<GestureDetector>
     {
         gesture = new Gesture();
         
-        if (Touchscreen.current.touches.Count > 0)
+        if (Input.touchCount > 0)
         {
-            Touch touch = Touchscreen.current.touches[0];
+            Touch touch = Input.GetTouch(0);
 
             if (touch.phase == TouchPhase.Began)
             {
-                startPos = touch.position;
+                gesture.startPos = touch.position;
             }
             else if (touch.phase == TouchPhase.Moved)
             {
-                endPos = touch.position;
-                delta = endPos - startPos;
-                distance = delta.magnitude;
+                gesture.endPos = touch.position;
+                gesture.delta = gesture.endPos - gesture.startPos;
+                gesture.distance = gesture.delta.magnitude;
 
-                if (distance > 50f)
+                if (gesture.distance > 50f)
                 {
                     // Swipe
-                    if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+                    if (Mathf.Abs(gesture.delta.x) > Mathf.Abs(gesture.delta.y))
                     {
                         // Horizontal swipe
-                        if (delta.x > 0)
+                        if (gesture.delta.x > 0)
                         {
-                            currentGesture = GestureType.SwipeRight;
+                            gesture.currentGesture = GestureType.SwipeRight;
                         }
                         else
                         {
-                            currentGesture = GestureType.SwipeLeft;
+                            gesture.currentGesture = GestureType.SwipeLeft;
                         }
                     }
                     else
                     {
                         // Vertical swipe
-                        if (delta.y > 0)
+                        if (gesture.delta.y > 0)
                         {
-                            currentGesture = GestureType.SwipeUp;
+                            gesture.currentGesture = GestureType.SwipeUp;
                         }
                         else
                         {
-                            currentGesture = GestureType.SwipeDown;
+                            gesture.currentGesture = GestureType.SwipeDown;
                         }
                     }
                 }
             }
             else if (touch.phase == TouchPhase.Ended)
             {
-                if (distance < 50f)
+                if (gesture.distance < 50f)
                 {
                     // Tap
-                    currentGesture = GestureType.Tap;
+                    gesture.currentGesture = GestureType.Tap;
                 }
             }
         }
         else
         {
             // No gesture
-            currentGesture = GestureType.None;
+            gesture.currentGesture = GestureType.None;
         }
+
+        currentGesture = gesture.currentGesture.ToString();
     }
 
     #endregion
