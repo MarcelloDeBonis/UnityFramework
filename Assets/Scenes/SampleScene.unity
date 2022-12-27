@@ -387,7 +387,7 @@ GameObject:
   m_Component:
   - component: {fileID: 785057682}
   - component: {fileID: 785057681}
-  - component: {fileID: 785057680}
+  - component: {fileID: 785057683}
   m_Layer: 0
   m_Name: Savsystem
   m_TagString: Untagged
@@ -395,19 +395,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &785057680
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 785057679}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ad93477287b793488216f82229a0fca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  text: {fileID: 870146946}
 --- !u!114 &785057681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -421,7 +408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPersistent: 0
-  instance: {fileID: 785057680}
+  instance: {fileID: 785057683}
 --- !u!4 &785057682
 Transform:
   m_ObjectHideFlags: 0
@@ -437,6 +424,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &785057683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785057679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ad93477287b793488216f82229a0fca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 870146946}
 --- !u!1 &870146944
 GameObject:
   m_ObjectHideFlags: 0
@@ -698,7 +698,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4958f202350677048a571058597de185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPersistent: 0
 --- !u!4 &1063003823
 Transform:
   m_ObjectHideFlags: 0
@@ -1170,7 +1169,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 785057680}
+      - m_Target: {fileID: 785057683}
         m_TargetAssemblyTypeName: SaveClass, Assembly-CSharp
         m_MethodName: AddPoints
         m_Mode: 1
