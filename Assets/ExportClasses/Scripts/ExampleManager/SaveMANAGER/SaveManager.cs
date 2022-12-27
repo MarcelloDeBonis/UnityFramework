@@ -6,6 +6,7 @@ public class SaveManager : Singleton<SaveManager>
 {
 #region Variables & Properties
 
+
 [SerializeField] private SaveClass instance;
 
 #endregion
@@ -18,12 +19,12 @@ public class SaveManager : Singleton<SaveManager>
 
 public void saveinstace()
 {
-    SaveSystem.Instance.Save("ciao", instance);
+    SaveSystem.Save("ciao","saluti", instance);
 }
 
 public void loadinstance()
 {
-    instance = SaveSystem.Instance.Load<SaveClass>("ciao");
+    instance = SaveSystem.Load("ciao", "saluti");
     instance.SetText();
 }
 

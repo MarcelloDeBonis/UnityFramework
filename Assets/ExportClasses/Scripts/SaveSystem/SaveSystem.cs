@@ -4,56 +4,62 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.Serialization;
 
 
-public class SaveSystem : Singleton<SaveSystem>
+public class SaveSystem : MonoBehaviour
 {
-    #region Variables & Properties
-
-    #endregion
-
-    #region MonoBehaviour
-
-
-    #endregion
-
+    
     #region Methods
 
-    public void Save(string saveName, object objectToSave)
+    public static void Save(string fileName, string directory, SaveClass obj)
     {
-        
+        if (!DirectoryExists(directory))
+        {
+            Directory.CreateDirectory(Application.persistentDataPath + "/" + directory);
+        }
         BinaryFormatter formatter = new BinaryFormatter();
-        string path =Path.Combine(Application.persistentDataPath, saveName + ".json");
-        FileStream stream = new FileStream(path, FileMode.Create);
-
-       object data = objectToSave;
-
-        formatter.Serialize(stream, objectToSave);
-        stream.Close();
+        FileStream file = File.Create(GetFullPath(fileName, directory));
+        formatter.Serialize(file, obj);
+        file.Close();
     }
 
-    public T Load<T>(string saveName)
+    public static SaveClass Load(string fileName, string directory)
     {
-        string path = Application.persistentDataPath + "/" + saveName + ".sav";
 
-        if (File.Exists(path))
+        if (SaveExists(fileName, directory))
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Open);
-
-            object data = formatter.Deserialize(stream) as object;
-            stream.Close();
-
-            return (T)data;
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                FileStream file = File.Open(GetFullPath(fileName, directory), FileMode.Open);
+                SaveClass obj = (SaveClass)formatter.Deserialize(file);
+                file.Close();
+                return obj;
+            }
+            catch (SerializationException)
+            {
+                Debug.Log("Failed to load file!");
+            }
         }
-        else
-        {
-            Debug.LogError("Save file not found in " + path);
-            return default(T);
-        }
 
-        
+        return null;
+    }
 
+    private static bool SaveExists(string fileName, string directory)
+    {
+        return File.Exists(GetFullPath(fileName, directory));
+    }
+
+    private static bool DirectoryExists(string directory)
+    {
+        return Directory.Exists(Application.persistentDataPath + "/" + directory);
+    }
+    
+    
+    public static string GetFullPath(string fileName, string directory)
+    {
+        return Application.persistentDataPath + "/" + directory + "/" + fileName;
     }
     
     #endregion

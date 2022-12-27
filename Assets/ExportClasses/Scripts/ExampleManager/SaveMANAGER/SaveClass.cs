@@ -8,12 +8,22 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
-[System.Serializable] public class SaveClass: MonoBehaviour
+public class SaveClassParent : MonoBehaviour
+
 {
 #region Variables & Properties
 
+[System.Serializable]
+public class DataClassParent
+{
+    private int points;
+    private int bestscore;
+    private Mesh myMesh;
+}
+
+private DataClassParent data;
 [SerializeField] private Text text;
-private int points;
+
 
 #endregion
 
