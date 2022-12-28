@@ -121,10 +121,19 @@ public class GestureDetector : Singleton<GestureDetector>
     #region Variables & Properties
 
     private Gesture gesture= new Gesture();
+    private float minDistance;
+    private bool tapCourutine;
     
     #endregion
     
     #region MonoBehaviour
+
+    protected override void Awake()
+    {
+        base.Awake();
+        minDistance = Screen.height * 15 / 100;
+    }
+
     private void Update()
     {
         VerifyInput();
@@ -160,52 +169,7 @@ public class GestureDetector : Singleton<GestureDetector>
                 break;
             case 2:
 
-                gesture.startPos = touch.position;
-                
-                else if (touch.phase == TouchPhase.Moved)
-                {
-                    gesture.endPos = touch.position;
-                    gesture.delta = gesture.endPos - gesture.startPos;
-                    gesture.distance = gesture.delta.magnitude;
-
-                    if (gesture.distance > 50f)
-                    {
-                        // Swipe
-                        if (Mathf.Abs(gesture.delta.x) > Mathf.Abs(gesture.delta.y))
-                        {
-                            // Horizontal swipe
-                            if (gesture.delta.x > 0)
-                            {
-                                gesture.currentGesture = GestureType.SwipeRight;
-                            }
-                            else
-                            {
-                                gesture.currentGesture = GestureType.SwipeLeft;
-                            }
-                        }
-                        else
-                        {
-                            // Vertical swipe
-                            if (gesture.delta.y > 0)
-                            {
-                                gesture.currentGesture = GestureType.SwipeUp;
-                            }
-                            else
-                            {
-                                gesture.currentGesture = GestureType.SwipeDown;
-                            }
-                        }
-                    }
-                }
-                else if (touch.phase == TouchPhase.Ended)
-                {
-                    if (gesture.distance < 50f)
-                    {
-                        // Tap
-                        gesture.currentGesture = GestureType.Tap;
-                    }
-                }
-
+                TwoTouch();
                 break;
         }
     }
@@ -227,30 +191,132 @@ public class GestureDetector : Singleton<GestureDetector>
                         
                 break;
             case TouchPhase.Moved:
-
+                
+                if (tapCourutine)
+                {
+                    gesture.SetEndPos(gesture.GetTouchListElement(0).position);
+                    StartCoroutine(VerifyTimePressing());
+                }
+                
                 break;
             case TouchPhase.Ended:
+
+                if (tapCourutine)
+                {
+                    
+                }
+                else
+                {
+                    
+                }
+                if (Vector3.Dot(gesture.GetTouchListElement(0).position,gesture.GetTouchListElement(0).position) > 0.85f)
+                {
+                    gesture.SetCurrentGesture(GestureType.Tap);
+                }
                 
+                gesture.SetEndPos(gesture.GetTouchListElement(0).position);
                 StopCoroutine(VerifyTimeTap());
+                SetSwipe();
+                
                 break;
         }
     }
 
+    private void TwoTouch()
+    {
+        
+    }
+
+    private void SetSwipe()
+    {
+        if (Mathf.Abs(gesture.GetEndPos().x - gesture.GetStartPos().x)>minDistance || Mathf.Abs(gesture.GetEndPos().y-gesture.GetStartPos().y)> minDistance)
+        {
+            if (Mathf.Abs(gesture.GetEndPos().x-gesture.GetStartPos().x) > Mathf.Abs(gesture.GetEndPos().y-gesture.GetStartPos().y))
+            {
+                if (gesture.GetEndPos().x > gesture.GetStartPos().x)
+                {
+                    gesture.SetCurrentGesture(GestureType.SwipeRight);
+                }
+                else
+                {
+                    gesture.SetCurrentGesture(GestureType.SwipeLeft);
+                }
+            }
+            else
+            {
+                if (gesture.GetEndPos().y > gesture.GetStartPos().y)
+                {
+                    gesture.SetCurrentGesture(GestureType.SwipeUp);
+                }
+                else
+                {
+                    gesture.SetCurrentGesture(GestureType.SwipeDown);
+                }
+            }
+        }
+    }
+    
     #region Courutines
 
     private IEnumerator VerifyTimeTap()
     {
+        tapCourutine = true;
+        
         Touch tapped = gesture.GetTouchListElement(0);
         yield return new WaitForSeconds(gesture.GetTapTime());
-        if (tapped == gesture.GetTouchListElement(0))
-        {
-            
-        }
+
+        tapCourutine = false;
     }
 
     #endregion
    
 
     #endregion
+    
+    gesture.startPos = touch.position;
+                
+    else if (touch.phase == TouchPhase.Moved)
+    {
+        gesture.endPos = touch.position;
+        gesture.delta = gesture.endPos - gesture.startPos;
+        gesture.distance = gesture.delta.magnitude;
+
+        if (gesture.distance > 50f)
+        {
+            // Swipe
+            if (Mathf.Abs(gesture.delta.x) > Mathf.Abs(gesture.delta.y))
+            {
+                // Horizontal swipe
+                if (gesture.delta.x > 0)
+                {
+                    gesture.currentGesture = GestureType.SwipeRight;
+                }
+                else
+                {
+                    gesture.currentGesture = GestureType.SwipeLeft;
+                }
+            }
+            else
+            {
+                // Vertical swipe
+                if (gesture.delta.y > 0)
+                {
+                    gesture.currentGesture = GestureType.SwipeUp;
+                }
+                else
+                {
+                    gesture.currentGesture = GestureType.SwipeDown;
+                }
+            }
+        }
+    }
+else if (touch.phase == TouchPhase.Ended)
+{
+    if (gesture.distance < 50f)
+    {
+        // Tap
+        gesture.currentGesture = GestureType.Tap;
+    }
+}
 }
 
