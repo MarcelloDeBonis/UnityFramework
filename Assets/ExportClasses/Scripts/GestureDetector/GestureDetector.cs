@@ -8,6 +8,7 @@ public enum GestureType
 {
     None,
     Tap,
+    Pressed,
     DoubleTap,
     SwipeUp,
     SwipeDown,
@@ -34,7 +35,7 @@ public class Gesture
         touchLists.Clear();
     }
 
-    [SerializeField] private float tapTime;
+    [SerializeField] private float tapTime = 0.5f;
     private List<Touch> touchLists = new List<Touch>();
     private Vector2 startPos;
     private Vector2 endPos;
@@ -120,9 +121,10 @@ public class GestureDetector : Singleton<GestureDetector>
 {
     #region Variables & Properties
 
-    private Gesture gesture= new Gesture();
+    public Gesture gesture= new Gesture();
     private float minDistance;
     private bool tapCourutine;
+    public string curgest;
     
     #endregion
     
@@ -137,6 +139,7 @@ public class GestureDetector : Singleton<GestureDetector>
     private void Update()
     {
         VerifyInput();
+        curgest = gesture.GetCurrentGesture().ToString();
     }
     
     #endregion
@@ -164,7 +167,6 @@ public class GestureDetector : Singleton<GestureDetector>
                 break;
 
             case 1:
-
                 OneTouch();
                 break;
             case 2:
@@ -192,30 +194,28 @@ public class GestureDetector : Singleton<GestureDetector>
                 break;
             case TouchPhase.Moved:
                 
-                if (tapCourutine)
-                {
                     gesture.SetEndPos(gesture.GetTouchListElement(0).position);
-                    StartCoroutine(VerifyTimePressing());
-                }
-                
+
                 break;
             case TouchPhase.Ended:
-
+                
                 if (tapCourutine)
                 {
-                    
+                    gesture.SetCurrentGesture(GestureType.Tap);
+                    StopCoroutine(VerifyTimeTap());
                 }
                 else
                 {
-                    
+                    gesture.SetCurrentGesture(GestureType.Pressed);
                 }
+                
+                
                 if (Vector3.Dot(gesture.GetTouchListElement(0).position,gesture.GetTouchListElement(0).position) > 0.85f)
                 {
                     gesture.SetCurrentGesture(GestureType.Tap);
                 }
                 
                 gesture.SetEndPos(gesture.GetTouchListElement(0).position);
-                StopCoroutine(VerifyTimeTap());
                 SetSwipe();
                 
                 break;
@@ -272,51 +272,5 @@ public class GestureDetector : Singleton<GestureDetector>
    
 
     #endregion
-    
-    gesture.startPos = touch.position;
-                
-    else if (touch.phase == TouchPhase.Moved)
-    {
-        gesture.endPos = touch.position;
-        gesture.delta = gesture.endPos - gesture.startPos;
-        gesture.distance = gesture.delta.magnitude;
-
-        if (gesture.distance > 50f)
-        {
-            // Swipe
-            if (Mathf.Abs(gesture.delta.x) > Mathf.Abs(gesture.delta.y))
-            {
-                // Horizontal swipe
-                if (gesture.delta.x > 0)
-                {
-                    gesture.currentGesture = GestureType.SwipeRight;
-                }
-                else
-                {
-                    gesture.currentGesture = GestureType.SwipeLeft;
-                }
-            }
-            else
-            {
-                // Vertical swipe
-                if (gesture.delta.y > 0)
-                {
-                    gesture.currentGesture = GestureType.SwipeUp;
-                }
-                else
-                {
-                    gesture.currentGesture = GestureType.SwipeDown;
-                }
-            }
-        }
-    }
-else if (touch.phase == TouchPhase.Ended)
-{
-    if (gesture.distance < 50f)
-    {
-        // Tap
-        gesture.currentGesture = GestureType.Tap;
-    }
-}
 }
 
