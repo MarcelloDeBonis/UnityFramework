@@ -154,6 +154,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IsPersistent: 1
+  tapTime: 0.5
 --- !u!4 &94950039
 Transform:
   m_ObjectHideFlags: 0

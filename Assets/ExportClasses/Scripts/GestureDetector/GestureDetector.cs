@@ -6,16 +6,16 @@ using UnityEngine;
 
 public enum GestureType
 {
-    None = 0,
-    Tap = 1,
-    Pressed = 2,
-    DoubleTap = 3,
-    SwipeUp = 4,
-    SwipeDown = 5,
-    SwipeLeft = 6,
-    SwipeRight = 7,
-    PinchIn = 8,
-    PinchOut = 9
+    None,
+    Tap,
+    Pressed,
+    DoubleTap,
+    SwipeUp,
+    SwipeDown,
+    SwipeLeft,
+    SwipeRight,
+    PinchIn,
+    PinchOut
 }
 
 public class Gesture
@@ -29,19 +29,14 @@ public class Gesture
     {
         startPos = new Vector2(0, 0);
         endPos = new Vector2(0, 0);
-        delta = new Vector2(0, 0);
-        distance = 0;
         currentGesture = GestureType.None;
         touchLists.Clear();
     }
 
-    [SerializeField] private float tapTime = 0.5f;
     private List<Touch> touchLists = new List<Touch>();
     private Vector2 startPos;
     private Vector2 endPos;
-    private Vector2 delta;
-    private float distance;
-    public GestureType currentGesture;
+    private GestureType currentGesture;
 
     #region Setters
 
@@ -55,16 +50,6 @@ public class Gesture
         endPos = newEndPos;
     }
 
-    public void SetDelta(Vector2 newDelta)
-    {
-        delta = newDelta;
-    }
-
-    public void SetDistance(float newDistance)
-    {
-        distance = newDistance;
-    }
-
     public void SetCurrentGesture(GestureType newCurrentGesture)
     {
         currentGesture = newCurrentGesture;
@@ -74,11 +59,6 @@ public class Gesture
     
     #region Getters
 
-    public float GetTapTime()
-    {
-        return tapTime;
-    }
-    
     public Vector2 GetStartPos()
     {
         return startPos;
@@ -88,17 +68,7 @@ public class Gesture
     {
         return endPos;
     }
-    
-    public Vector2 GetDelta()
-    {
-        return delta;
-    }
-    
-    public float GetDistance()
-    {
-        return distance;
-    }
-    
+
     public GestureType GetCurrentGesture()
     {
         return currentGesture;
@@ -125,7 +95,8 @@ public class GestureDetector : Singleton<GestureDetector>
     private float minDistance;
     private bool tapCourutine = false;
     private int touchCount;
-
+    
+    [SerializeField] private float tapTime;
     #endregion
     
     #region MonoBehaviour
@@ -138,7 +109,7 @@ public class GestureDetector : Singleton<GestureDetector>
 
     private void Update()
     {
-        
+        VerifyInput();
     }
     
     #endregion
@@ -153,7 +124,7 @@ public class GestureDetector : Singleton<GestureDetector>
         }
     }
     
-    public void VerifyInput()
+    private void VerifyInput()
     {
         AssignTouchList();
         
@@ -285,7 +256,7 @@ public class GestureDetector : Singleton<GestureDetector>
     {
 
         Touch tapped = gesture.GetTouchListElement(0);
-        yield return new WaitForSeconds(gesture.GetTapTime());
+        yield return new WaitForSeconds(tapTime);
         if (Vector3.Dot(gesture.GetStartPos(), tapped.position) > 0.85f)
         {
             tapCourutine = true;
