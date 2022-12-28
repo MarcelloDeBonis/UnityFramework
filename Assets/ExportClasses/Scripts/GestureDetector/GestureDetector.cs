@@ -6,16 +6,16 @@ using UnityEngine;
 
 public enum GestureType
 {
-    None,
-    Tap,
-    Pressed,
-    DoubleTap,
-    SwipeUp,
-    SwipeDown,
-    SwipeLeft,
-    SwipeRight,
-    PinchIn,
-    PinchOut
+    None = 0,
+    Tap = 1,
+    Pressed = 2,
+    DoubleTap = 3,
+    SwipeUp = 4,
+    SwipeDown = 5,
+    SwipeLeft = 6,
+    SwipeRight = 7,
+    PinchIn = 8,
+    PinchOut = 9
 }
 
 public class Gesture
@@ -41,7 +41,7 @@ public class Gesture
     private Vector2 endPos;
     private Vector2 delta;
     private float distance;
-    private GestureType currentGesture;
+    public GestureType currentGesture;
 
     #region Setters
 
@@ -123,9 +123,9 @@ public class GestureDetector : Singleton<GestureDetector>
 
     public Gesture gesture= new Gesture();
     private float minDistance;
-    private bool tapCourutine;
-    public string curgest;
-    
+    private bool tapCourutine = false;
+    private int touchCount;
+
     #endregion
     
     #region MonoBehaviour
@@ -138,8 +138,7 @@ public class GestureDetector : Singleton<GestureDetector>
 
     private void Update()
     {
-        VerifyInput();
-        curgest = gesture.GetCurrentGesture().ToString();
+        
     }
     
     #endregion
@@ -154,9 +153,8 @@ public class GestureDetector : Singleton<GestureDetector>
         }
     }
     
-    private void VerifyInput()
+    public void VerifyInput()
     {
-
         AssignTouchList();
         
         switch (Input.touchCount)
@@ -183,39 +181,35 @@ public class GestureDetector : Singleton<GestureDetector>
     
     private void OneTouch()
     {
-        switch (gesture.GetTouchListElement(0).phase)
+        Touch touch = Input.GetTouch(0);
+        
+        switch (touch.phase)
         {
             case TouchPhase.Began:
 
-                gesture.SetStartPos(gesture.GetTouchListElement(0).position);
-                gesture.SetEndPos(gesture.GetTouchListElement(0).position);
+                gesture.SetStartPos(touch.position);
+                gesture.SetEndPos(touch.position);
                 StartCoroutine(VerifyTimeTap());
-                        
+
                 break;
             case TouchPhase.Moved:
                 
-                    gesture.SetEndPos(gesture.GetTouchListElement(0).position);
+                    gesture.SetEndPos(touch.position);
 
                 break;
             case TouchPhase.Ended:
-                
-                if (tapCourutine)
+                gesture.SetEndPos(touch.position);
+
+                if (tapCourutine == false)
                 {
                     gesture.SetCurrentGesture(GestureType.Tap);
-                    StopCoroutine(VerifyTimeTap());
                 }
                 else
                 {
                     gesture.SetCurrentGesture(GestureType.Pressed);
+                    tapCourutine = false;
                 }
-                
-                
-                if (Vector3.Dot(gesture.GetTouchListElement(0).position,gesture.GetTouchListElement(0).position) > 0.85f)
-                {
-                    gesture.SetCurrentGesture(GestureType.Tap);
-                }
-                
-                gesture.SetEndPos(gesture.GetTouchListElement(0).position);
+
                 SetSwipe();
                 
                 break;
@@ -224,6 +218,35 @@ public class GestureDetector : Singleton<GestureDetector>
 
     private void TwoTouch()
     {
+        float touchersPrevPosDif;
+        float touchesCurPosDIf;
+        
+        Vector2 firstTouchPrevPos;
+        Vector2 secondTouchPrevPos;
+
+        if (Input.touchCount == 2)
+        {
+            Touch firstTouch = Input.GetTouch(0);
+            Touch secondTouch = Input.GetTouch(1);
+
+            firstTouchPrevPos = firstTouch.position - firstTouch.deltaPosition;
+            secondTouchPrevPos = secondTouch.position - secondTouch.deltaPosition;
+
+            touchersPrevPosDif = (firstTouchPrevPos - secondTouchPrevPos).magnitude;
+            touchesCurPosDIf = (firstTouch.position - secondTouch.position).magnitude;
+            
+            if (touchersPrevPosDif > touchesCurPosDIf)
+            {
+                //Pin in
+                gesture.SetCurrentGesture(GestureType.PinchIn);
+            }
+
+            if (touchersPrevPosDif < touchesCurPosDIf)
+            {
+                //Pinc out
+                gesture.SetCurrentGesture(GestureType.PinchOut);
+            }
+        }
         
     }
 
@@ -260,12 +283,14 @@ public class GestureDetector : Singleton<GestureDetector>
 
     private IEnumerator VerifyTimeTap()
     {
-        tapCourutine = true;
-        
+
         Touch tapped = gesture.GetTouchListElement(0);
         yield return new WaitForSeconds(gesture.GetTapTime());
+        if (Vector3.Dot(gesture.GetStartPos(), tapped.position) > 0.85f)
+        {
+            tapCourutine = true;
+        }
 
-        tapCourutine = false;
     }
 
     #endregion
