@@ -123,6 +123,7 @@ public class GestureDetector : Singleton<GestureDetector>
 
     private void Update()
     {
+        Debug.Log(gesture.GetCurrentGesture());
         VerifyInput();
     }
     
@@ -262,6 +263,7 @@ public class GestureDetector : Singleton<GestureDetector>
 
     private void SetSwipe()
     {
+        Debug.Log("SetSwipe");
         if (Mathf.Abs(gesture.GetEndPos().x - gesture.GetStartPos().x)>minDistance || Mathf.Abs(gesture.GetEndPos().y-gesture.GetStartPos().y)> minDistance)
         {
             if (Mathf.Abs(gesture.GetEndPos().x-gesture.GetStartPos().x) > Mathf.Abs(gesture.GetEndPos().y-gesture.GetStartPos().y))
