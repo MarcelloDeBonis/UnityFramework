@@ -8,7 +8,7 @@ public enum GestureType
 {
     None,
     Tap,
-    Pressed,
+    Pressing,
     DoubleTap,
     SwipeUp,
     SwipeDown,
@@ -37,9 +37,15 @@ public class Gesture
     private Vector2 startPos;
     private Vector2 endPos;
     private GestureType currentGesture;
+    private float timePressing;
 
     #region Setters
 
+    public void SetTimePressing(float newTimePressing)
+    {
+        timePressing = newTimePressing;
+    }
+    
     public void SetStartPos(Vector2 newStartPos)
     {
         startPos = newStartPos;
@@ -59,6 +65,11 @@ public class Gesture
     
     #region Getters
 
+    public float GetTimePressing()
+    {
+        return timePressing;
+    }
+    
     public Vector2 GetStartPos()
     {
         return startPos;
@@ -94,9 +105,12 @@ public class GestureDetector : Singleton<GestureDetector>
     public Gesture gesture= new Gesture();
     private float minDistance;
     private bool tapCourutine = false;
+    private bool lastGestureTap = false;
     private int touchCount;
-    
+
     [SerializeField] private float tapTime;
+    [SerializeField] private float doubleTapTime;
+    
     #endregion
     
     #region MonoBehaviour
@@ -157,28 +171,41 @@ public class GestureDetector : Singleton<GestureDetector>
         switch (touch.phase)
         {
             case TouchPhase.Began:
-
+                
                 gesture.SetStartPos(touch.position);
                 gesture.SetEndPos(touch.position);
-                StartCoroutine(VerifyTimeTap());
+
+                CheckTapCounter();
 
                 break;
             case TouchPhase.Moved:
-                
-                    gesture.SetEndPos(touch.position);
+
+                if (tapCourutine)
+                {
+                    float timePressing = gesture.GetTimePressing();
+                    gesture.SetTimePressing(timePressing+=Time.deltaTime);
+                }
+                gesture.SetEndPos(touch.position);
 
                 break;
             case TouchPhase.Ended:
+                
                 gesture.SetEndPos(touch.position);
 
-                if (tapCourutine == false)
+                switch (tapCourutine)
                 {
-                    gesture.SetCurrentGesture(GestureType.Tap);
-                }
-                else
-                {
-                    gesture.SetCurrentGesture(GestureType.Pressed);
-                    tapCourutine = false;
+                    case true:
+                        
+                        tapCourutine = false;
+                        break;
+                    
+                    case false:
+
+                        gesture.SetTimePressing(0);
+                        StartCoroutine(VerifyDoubleTap());
+                        gesture.SetCurrentGesture(GestureType.Tap);
+                        
+                    break;
                 }
 
                 SetSwipe();
@@ -187,6 +214,20 @@ public class GestureDetector : Singleton<GestureDetector>
         }
     }
 
+    private void CheckTapCounter()
+    {
+        switch (lastGestureTap)
+        {
+            case true:
+                gesture.SetCurrentGesture(GestureType.DoubleTap);
+                break;
+                
+            case false :
+                StartCoroutine(VerifyTimeTap());
+                break;
+        } 
+    }
+    
     private void TwoTouch()
     {
         float touchersPrevPosDif;
@@ -195,8 +236,6 @@ public class GestureDetector : Singleton<GestureDetector>
         Vector2 firstTouchPrevPos;
         Vector2 secondTouchPrevPos;
 
-        if (Input.touchCount == 2)
-        {
             Touch firstTouch = Input.GetTouch(0);
             Touch secondTouch = Input.GetTouch(1);
 
@@ -217,7 +256,7 @@ public class GestureDetector : Singleton<GestureDetector>
                 //Pinc out
                 gesture.SetCurrentGesture(GestureType.PinchOut);
             }
-        }
+        
         
     }
 
@@ -260,10 +299,18 @@ public class GestureDetector : Singleton<GestureDetector>
         if (Vector3.Dot(gesture.GetStartPos(), tapped.position) > 0.85f)
         {
             tapCourutine = true;
+            gesture.SetCurrentGesture(GestureType.Pressing);
         }
 
     }
 
+    private IEnumerator VerifyDoubleTap()
+    {
+        lastGestureTap = true;
+        yield return new WaitForSeconds(doubleTapTime);
+        lastGestureTap = false;
+    }
+    
     #endregion
    
 
