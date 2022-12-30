@@ -7,12 +7,12 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
 
-public class SaveSystem : MonoBehaviour
+public class SaveSystem : Singleton<SaveSystem>
 {
     
     #region Methods
 
-    public static void Save(string fileName, string directory, SaveClass obj)
+    public void Save(DataClassParent obj, string fileName, string directory)
     {
         if (!DirectoryExists(directory))
         {
@@ -24,40 +24,22 @@ public class SaveSystem : MonoBehaviour
         file.Close();
     }
 
-    public static SaveClass Load(string fileName, string directory)
+    public T Load<T>(string fileName, string directory) where T: DataClassParent
     {
-
-        if (SaveExists(fileName, directory))
-        {
-            try
-            {
-                BinaryFormatter formatter = new BinaryFormatter();
-                FileStream file = File.Open(GetFullPath(fileName, directory), FileMode.Open);
-                SaveClass obj = (SaveClass)formatter.Deserialize(file);
-                file.Close();
-                return obj;
-            }
-            catch (SerializationException)
-            {
-                Debug.Log("Failed to load file!");
-            }
-        }
-
-        return null;
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream file = File.Open(GetFullPath(fileName, directory), FileMode.Open);
+        T obj = (T)formatter.Deserialize(file);
+        file.Close();
+        return obj;
     }
 
-    private static bool SaveExists(string fileName, string directory)
-    {
-        return File.Exists(GetFullPath(fileName, directory));
-    }
-
-    private static bool DirectoryExists(string directory)
+    private bool DirectoryExists(string directory)
     {
         return Directory.Exists(Application.persistentDataPath + "/" + directory);
     }
     
     
-    public static string GetFullPath(string fileName, string directory)
+    private string GetFullPath(string fileName, string directory)
     {
         return Application.persistentDataPath + "/" + directory + "/" + fileName;
     }

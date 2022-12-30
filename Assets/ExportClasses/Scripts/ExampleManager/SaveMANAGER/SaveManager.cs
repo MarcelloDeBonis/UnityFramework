@@ -2,32 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SaveManager : Singleton<SaveManager>
+public class SaveManager : MonoBehaviour
 {
-#region Variables & Properties
 
+    [SerializeField] private SaveClassConcrete myClass;
 
-[SerializeField] private SaveClass instance;
+    public void AddScore()
+    {
+        myClass.GainScore();
+    }
 
-#endregion
+    public void LoadAllClass()
+    {
+        myClass.LoadData();
+    }
 
-#region MonoBehaviour
-
-#endregion
-
-#region Methods
-
-public void saveinstace()
-{
-    SaveSystem.Save("ciao","saluti", instance);
-}
-
-public void loadinstance()
-{
-    instance = SaveSystem.Load("ciao", "saluti");
-    instance.SetText();
-}
-
-#endregion
-
+    public void SaveAllClass()
+    {
+        myClass.SaveClass();
+    }
 }
