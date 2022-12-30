@@ -2,23 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Mime;
-using System.Runtime.InteropServices.ComTypes;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-[System.Serializable]
+[Serializable]
 public class DataClassParent
 {
     
 }
 
-public interface SaveClassParent<T> where T: DataClassParent
-
+public class SaveClassParent<T>: MonoBehaviour where T: DataClassParent
 {
     
 #region Variables & Properties
-
 
     public T data;
     [SerializeField] private string fileName;
@@ -27,11 +23,6 @@ public interface SaveClassParent<T> where T: DataClassParent
 #endregion
 
 #region Methods
-
-private virtual void Awake()
-{
-    
-}
 
 public virtual void SaveClass()
 {

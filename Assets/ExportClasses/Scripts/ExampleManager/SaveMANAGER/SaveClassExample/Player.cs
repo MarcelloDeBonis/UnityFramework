@@ -5,20 +5,21 @@ using System.Net.Mime;
 using UnityEngine;
 using UnityEngine.UI;
 
+[Serializable]
 public class PlayerData: DataClassParent
 {
-    public int score=0;
+    public int score;
     public List<int> inventory = new List<int>();
 }
 
-public class Player: SaveClassParent<DataClassConcrete>
+public class Player: SaveClassParent<PlayerData>
 {
 
     [SerializeField] private Text textReference;
 
     private void Awake()
     {
-        
+        data = new PlayerData();
     }
 
     public void GainScore()
@@ -29,7 +30,6 @@ public class Player: SaveClassParent<DataClassConcrete>
 
     public override void SaveClass()
     {
-        data.textReference = textReference;
         base.SaveClass();
     }
 }

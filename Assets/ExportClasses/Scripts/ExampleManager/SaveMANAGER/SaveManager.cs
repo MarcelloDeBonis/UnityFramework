@@ -5,7 +5,7 @@ using UnityEngine;
 public class SaveManager : MonoBehaviour
 {
 
-    [SerializeField] private SaveClassConcrete myClass;
+    [SerializeField] private Player myClass;
 
     public void AddScore()
     {
