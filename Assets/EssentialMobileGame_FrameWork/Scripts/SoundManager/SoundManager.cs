@@ -18,6 +18,11 @@ public class SoundManager : Singleton<SoundManager>
 
         #region Monobehaviour
 
+        private void Start()
+        {
+            singleSource = GetComponent<AudioSource>();
+        }
+
         private void Update()
         {
             if (multipleSounds && musicSources.Count!=0)

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 using UnityEngine;
@@ -100,6 +101,22 @@ public class Gesture
 
 public class GestureDetector : Singleton<GestureDetector>
 {
+    private int tapTimes = 0;
+    private int doubleTapTimes = 0;
+    private int PressingTimes = 0;
+    private int swipeUpTimes = 0;
+    private int swipeRightTimes = 0;
+    private int swipeLeftTimes = 0;
+    private int swipeDownTimes = 0;
+
+    [SerializeField] private TextMeshProUGUI textTap;
+    [SerializeField] private TextMeshProUGUI textDoubleTap;
+    [SerializeField] private TextMeshProUGUI textPressing;
+    [SerializeField] private TextMeshProUGUI textSwipeUp;
+    [SerializeField] private TextMeshProUGUI textSwipeDown;
+    [SerializeField] private TextMeshProUGUI textSwipeLeft;
+    [SerializeField] private TextMeshProUGUI textSwipeRight;
+    
     #region Variables & Properties
 
     public Gesture gesture= new Gesture();
@@ -123,8 +140,47 @@ public class GestureDetector : Singleton<GestureDetector>
 
     private void Update()
     {
-        Debug.Log(gesture.GetCurrentGesture());
+       
         VerifyInput();
+
+        switch (gesture.GetCurrentGesture())
+        {
+            case GestureType.Tap:
+                tapTimes++;
+                break;
+            case GestureType.DoubleTap:
+                doubleTapTimes++;
+                break;
+            case GestureType.Pressing:
+                PressingTimes++;
+                break;
+            case GestureType.SwipeDown:
+                swipeDownTimes++;
+                break;
+            case GestureType.SwipeLeft:
+                swipeLeftTimes++;
+                break;
+            case GestureType.SwipeRight:
+                swipeRightTimes++;
+                break;
+            case GestureType.SwipeUp:
+                swipeUpTimes++;
+                break;
+        }
+
+        textTap.text ="Tap Times:" + tapTimes.ToString();
+
+        textDoubleTap.text ="DoubleTap Times:" + doubleTapTimes.ToString();
+
+        textPressing.text ="Pressing Times:" + PressingTimes.ToString();
+
+        textSwipeDown.text ="SwipeDown Times:" + swipeDownTimes.ToString();
+
+        textSwipeLeft.text ="SwipeLeft Times:" + swipeLeftTimes.ToString();
+
+        textSwipeUp.text ="SwipeUp Times:" + swipeUpTimes.ToString();
+
+        textSwipeRight.text ="SwipeRight Times:" + swipeRightTimes.ToString();
     }
     
     #endregion
