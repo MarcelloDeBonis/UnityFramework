@@ -55,7 +55,6 @@ public class ObjectPoolable : MonoBehaviour
         float time = 0f;
         while (time < dieTime)
         {
-            Debug.Log(time);
             time += Time.deltaTime;
             yield return null;
         }

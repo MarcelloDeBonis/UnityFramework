@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Advertisements;
@@ -8,6 +9,9 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     [SerializeField] string _androidAdUnitId = "Rewarded_Android";
     [SerializeField] string _iOSAdUnitId = "Rewarded_iOS";
     string _adUnitId = null; // This will remain null for unsupported platforms
+
+    [SerializeField] private TMP_Text pointsText;
+    private int points = 0;
  
     void Awake()
     {   
@@ -60,6 +64,8 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
         {
             Debug.Log("Unity Ads Rewarded Ad Completed");
             // Grant a reward.
+            points += 10;
+            pointsText.text = $"Points: {points}";
             Debug.Log("You've gained 10 coins");
             
             // Load another ad:
